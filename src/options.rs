@@ -15,18 +15,16 @@ pub struct User {
 	pub master_password: Vec<u8>,
 }
 
-fn printpws(){
+fn printpws(entered_password: String){
 	#[derive(Deserialize)]
 	struct Password {
 		pub name: String,
 		pub username: String,
 		pub password: Vec<u8>,
 	}
-	let file_path = "rampart/master.json";
+
 	let vault_path = "rampart/vault.json";
-	let file_content = fs::read_to_string(file_path).unwrap();
 	let vault_content = fs::read_to_string(vault_path).unwrap();
-	let stored_user: User = serde_json::from_str(&file_content).expect("Failed to deserialize User object");
 	let stored_vault: Result<Vec<Password>, serde_json::Error> = serde_json::from_str(&vault_content);
 	match stored_vault {
 		Ok(vault) => {
@@ -36,7 +34,7 @@ fn printpws(){
 				println!(">> Password {}.", index+1);
 				println!("|| Name: {}", password.name);
 				println!("|| Username: {}", password.username);
-				println!("|| Password: {}", lockdown::decrypt(password.password.clone(), stored_user.master_password.clone()));
+				println!("|| Password: {}", lockdown::decrypt(password.password.clone(), entered_password.clone()));
 				println!("----------------------------------------");
 				println!();
 			}
@@ -75,7 +73,7 @@ pub fn listpw() {
 		return;
 	}
 
-	printpws();
+	printpws(master_password);
 
 }
 
@@ -123,7 +121,7 @@ pub fn addpw() {
 		let mut password = String::new();
 		stdin().read_line(&mut password).unwrap();
 		password = password.trim().to_string();
-		let encrypted_password = lockdown::encrypt(password, stored_user.master_password.clone());
+		let encrypted_password = lockdown::encrypt(password, master_password.clone());
 
 		let new_password = Password {
 			name,
@@ -178,7 +176,7 @@ pub fn delpw(){
 	} else {
 		println!("Correct password!");
 	}
-	printpws();
+	printpws(master_password);
 	println!("Enter the number of the password you want to delete:");
 	let mut answer = String::new();
 	stdin().read_line(&mut answer).unwrap();
