@@ -180,7 +180,15 @@ pub fn delpw(){
 	let mut answer = String::new();
 	stdin().read_line(&mut answer).unwrap();
 	answer = answer.trim().to_string();
-	let answer: usize = answer.parse().unwrap();
+	let answer = answer.parse::<i32>().unwrap();
+
+	//edge case
+	if answer <= 0 {
+		println!(" You can't delete a password that doesn't exist!");
+		return;
+	}
+
+	let answer = answer as usize;
 	let file_content = fs::read_to_string(vault_path).unwrap();
 	let mut stored_vault: Vec<Password> = serde_json::from_str(&file_content).unwrap_or_default();
 	stored_vault.remove(answer - 1);
