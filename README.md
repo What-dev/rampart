@@ -13,7 +13,7 @@ Rampart is a simple password manager that encrypts your passwords using a master
  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
  ```
 
-#### Download the source code or clone the repo, then in the Taskly directory run:
+#### Download the source code or clone the repo, then in the Rampart directory run:
 
 ```bash
 cargo build --release
