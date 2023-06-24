@@ -65,7 +65,7 @@ fn main() {
 
 
 
-
+loop {
     println!("\n                    Welcome to your Rampart Vault!");
     println!("                      What would you like to do?");
     println!("\n                    +++++++++++++++++++++++++++++++++");
@@ -87,7 +87,9 @@ fn main() {
         "3" => {
             options::delpw();
         }
-        _ => {}
+        _ => {break;}
     }
+
+}
 }
 
