@@ -13,7 +13,7 @@ pub struct User {
 }
 
 fn main() {
-    let file_path = "rampart/master.json";
+    let file_path = "master.json";
     let new_user = fs::metadata(file_path).is_err();
     if new_user {
         println!("Welcome to Rampart!");

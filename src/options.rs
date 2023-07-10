@@ -23,7 +23,7 @@ fn printpws(entered_password: String){
 		pub password: Vec<u8>,
 	}
 
-	let vault_path = "rampart/vault.json";
+	let vault_path = "vault.json";
 	let vault_content = fs::read_to_string(vault_path).unwrap();
 	let stored_vault: Result<Vec<Password>, serde_json::Error> = serde_json::from_str(&vault_content);
 	match stored_vault {
@@ -46,7 +46,7 @@ fn printpws(entered_password: String){
 }
 
 pub fn listpw() {
-	let file_path = "rampart/master.json";
+	let file_path = "master.json";
 	let master_password = rpassword::prompt_password("Enter master password to decrypt: ").unwrap();
 	let hashed_password = hash_password(master_password.as_bytes());
 
@@ -60,7 +60,7 @@ pub fn listpw() {
 		println!("                      --Correct password!--");
 	}
 
-	let file_path = "rampart/vault.json";
+	let file_path = "vault.json";
 	let new_user = fs::metadata(file_path).is_err();
 	if new_user {
 		fs::File::create(file_path).expect(" Failed to create file.");
@@ -84,8 +84,8 @@ pub fn addpw() {
 		pub password: Vec<u8>,
 	}
 
-	let vault_path = "rampart/vault.json";
-	let file_path = "rampart/master.json";
+	let vault_path = "vault.json";
+	let file_path = "master.json";
 	let new_user = fs::metadata(vault_path).is_err();
 	if new_user {
 		fs::File::create(vault_path).expect("Failed to create file.");
@@ -156,8 +156,8 @@ pub fn delpw(){
 		pub password: Vec<u8>,
 	}
 
-	let vault_path = "rampart/vault.json";
-	let file_path = "rampart/master.json";
+	let vault_path = "vault.json";
+	let file_path = "master.json";
 	let new_user = fs::metadata(vault_path).is_err();
 	if new_user {
 		println!(" How the hell do you expect to delete a password? You have no passwords to delete!");
