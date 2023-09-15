@@ -6,7 +6,7 @@ fn hash_password(password: &[u8]) -> Vec<u8> {
 	hashed_password
 }
 use std::fs;
-use std::io::{stdin}; // for print!()
+use std::io::stdin; // for print!()
 
 // for metadata()
 use serde::{Serialize, Deserialize}; // for User struct
