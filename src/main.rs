@@ -72,6 +72,7 @@ loop {
     println!("                        1. Add a new password");
     println!("                        2. List all passwords");
     println!("                        3. Delete a password");
+    println!("                        4. Edit an entry");
     println!("                        (Nothing): Exit");
 
     let mut input = String::new();
@@ -86,6 +87,9 @@ loop {
         }
         "3" => {
             options::delpw();
+        }
+        "4" => {
+            options::editselector();
         }
         _ => {break;}
     }

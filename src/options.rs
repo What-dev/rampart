@@ -28,6 +28,11 @@ fn printpws(entered_password: String){
 	let stored_vault: Result<Vec<Password>, serde_json::Error> = serde_json::from_str(&vault_content);
 	match stored_vault {
 		Ok(vault) => {
+			if vault.is_empty() {
+				println!("\n You have no passwords saved.");
+				return;
+			}
+
 			for password in &vault {
 				let index = vault.iter().position(|x| x.name == password.name).unwrap();
 				println!(">----------------------------------------<");
@@ -170,7 +175,7 @@ pub fn delpw(){
 	let stored_user: User = serde_json::from_str(&file_content).expect("Failed to deserialize User object");
 
 	if hashed_password != stored_user.master_password {
-		println!(" Incorrect password! Try again or delete rampart.json to start over (this will delete all saved passwords!).");
+		println!(" Incorrect password! Try again or delete vault.json to start over (this will delete all saved passwords!).");
 		return;
 	} else {
 		println!("                      --Correct password!--");
@@ -196,4 +201,208 @@ pub fn delpw(){
 		serde_json::to_string_pretty(&stored_vault).expect(" Failed to serialize User object.");
 	fs::write(vault_path, pw_struct.as_bytes()).expect(" Failed to write to file.");
 	println!("                      --Password deleted!--");
+}
+
+fn editpw(){
+	#[derive(Deserialize, Serialize)]
+	struct Password {
+		pub name: String,
+		pub username: String,
+		pub password: Vec<u8>,
+	}
+
+	let vault_path = "vault.json";
+	let file_path = "master.json";
+	let new_user = fs::metadata(vault_path).is_err();
+	if new_user {
+		println!(" How the hell do you expect to edit a password? You have no passwords to change!");
+		return;
+	}
+
+	let master_password = rpassword::prompt_password("Enter master password: ").unwrap();
+	let hashed_password = hash_password(master_password.as_bytes());
+	let file_content = fs::read_to_string(file_path).unwrap();
+	let stored_user: User = serde_json::from_str(&file_content).expect("Failed to deserialize User object");
+
+	if hashed_password != stored_user.master_password {
+		println!(" Incorrect password! Try again or delete vault.json to start over (this will delete all saved passwords!).");
+		return;
+	} else {
+		println!("                      --Correct password!--");
+	}
+
+	printpws(master_password);
+	println!("Enter the number of the password you want to edit:");
+	let mut answer = String::new();
+	stdin().read_line(&mut answer).unwrap();
+	answer = answer.trim().to_string();
+	let answer = answer.parse::<i32>().unwrap();
+
+	//edge case
+	if answer <= 0 {
+		println!(" You can't edit a password that doesn't exist!");
+		return;
+	}
+
+	let answer = answer as usize;
+	let file_content = fs::read_to_string(vault_path).unwrap();
+	let mut stored_vault: Vec<Password> = serde_json::from_str(&file_content).unwrap_or_default();
+
+	println!("Enter the new password for {}.", stored_vault[answer-1].name);
+	let mut newpw = String::new();
+	stdin().read_line(&mut newpw).unwrap();
+	newpw = newpw.trim().to_string();
+
+	println!("Enter the master password to encrypt the new password.");
+	let mut master_password = String::new();
+	stdin().read_line(&mut master_password).unwrap();
+	master_password = master_password.trim().to_string();
+
+	let encrypted_password = lockdown::encrypt(newpw, master_password.clone());
+	stored_vault[answer-1].password = encrypted_password;
+
+	let pw_struct =
+		serde_json::to_string_pretty(&stored_vault).expect(" Failed to serialize User object.");
+	fs::write(vault_path, pw_struct.as_bytes()).expect(" Failed to write to file.");
+	println!("                      --Password edited!--");
+
+}
+
+pub fn editun(){
+	#[derive(Deserialize, Serialize)]
+	struct Password {
+		pub name: String,
+		pub username: String,
+		pub password: Vec<u8>,
+	}
+
+	let vault_path = "vault.json";
+	let file_path = "master.json";
+	let new_user = fs::metadata(vault_path).is_err();
+	if new_user {
+		println!(" How the hell do you expect to edit a username? You have no usernames to change!");
+		return;
+	}
+
+	let master_password = rpassword::prompt_password("Enter master password: ").unwrap();
+	let hashed_password = hash_password(master_password.as_bytes());
+	let file_content = fs::read_to_string(file_path).unwrap();
+	let stored_user: User = serde_json::from_str(&file_content).expect("Failed to deserialize User object");
+
+	if hashed_password != stored_user.master_password {
+		println!(" Incorrect password! Try again or delete vault.json to start over (this will delete all saved passwords!).");
+		return;
+	} else {
+		println!("                      --Correct password!--");
+	}
+
+	printpws(master_password);
+	println!("Enter the number of the username you want to edit:");
+	let mut answer = String::new();
+	stdin().read_line(&mut answer).unwrap();
+	answer = answer.trim().to_string();
+	let answer = answer.parse::<i32>().unwrap();
+
+	//edge case
+	if answer <= 0 {
+		println!(" You can't edit an entry that doesn't exist!");
+		return;
+	}
+
+	let answer = answer as usize;
+	let file_content = fs::read_to_string(vault_path).unwrap();
+	let mut stored_vault: Vec<Password> = serde_json::from_str(&file_content).unwrap_or_default();
+
+	println!("Enter the new username for {}.", stored_vault[answer-1].name);
+	let mut newpw = String::new();
+	stdin().read_line(&mut newpw).unwrap();
+	newpw = newpw.trim().to_string();
+
+	stored_vault[answer-1].username = newpw;
+
+
+	let pw_struct =
+		serde_json::to_string_pretty(&stored_vault).expect(" Failed to serialize User object.");
+	fs::write(vault_path, pw_struct.as_bytes()).expect(" Failed to write to file.");
+	println!("                      --Username edited!--");
+}
+
+fn edittitle(){
+	#[derive(Deserialize, Serialize)]
+	struct Password {
+		pub name: String,
+		pub username: String,
+		pub password: Vec<u8>,
+	}
+
+	let vault_path = "vault.json";
+	let file_path = "master.json";
+	let new_user = fs::metadata(vault_path).is_err();
+	if new_user {
+		println!(" How the hell do you expect to edit an entries name? You have nothing!");
+		return;
+	}
+
+	let master_password = rpassword::prompt_password("Enter master password: ").unwrap();
+	let hashed_password = hash_password(master_password.as_bytes());
+	let file_content = fs::read_to_string(file_path).unwrap();
+	let stored_user: User = serde_json::from_str(&file_content).expect("Failed to deserialize User object");
+
+	if hashed_password != stored_user.master_password {
+		println!(" Incorrect password! Try again or delete vault.json to start over (this will delete all saved passwords!).");
+		return;
+	} else {
+		println!("                      --Correct password!--");
+	}
+
+	printpws(master_password);
+	println!("Enter the number of the entry you want to edit:");
+	let mut answer = String::new();
+	stdin().read_line(&mut answer).unwrap();
+	answer = answer.trim().to_string();
+	let answer = answer.parse::<i32>().unwrap();
+
+	//edge case
+	if answer <= 0 {
+		println!(" You can't edit an entry that doesn't exist!");
+		return;
+	}
+
+	let answer = answer as usize;
+	let file_content = fs::read_to_string(vault_path).unwrap();
+	let mut stored_vault: Vec<Password> = serde_json::from_str(&file_content).unwrap_or_default();
+
+	println!("Enter the new entry title for {}.", stored_vault[answer-1].name);
+	let mut newpw = String::new();
+	stdin().read_line(&mut newpw).unwrap();
+	newpw = newpw.trim().to_string();
+
+	stored_vault[answer-1].name = newpw;
+
+
+	let pw_struct =
+		serde_json::to_string_pretty(&stored_vault).expect(" Failed to serialize User object.");
+	fs::write(vault_path, pw_struct.as_bytes()).expect(" Failed to write to file.");
+	println!("                      --Entry Name edited!--");
+}
+
+
+pub fn editselector(){
+	println!("\n                     What would you like to edit?");
+	println!("\n                    +++++++++++++++++++++++++++++++++");
+	println!("                        1: Password");
+	println!("                        2: Username");
+	println!("                        3: Entry Title");
+	println!("                        Nothing: Exit");
+	let mut answer = String::new();
+	stdin().read_line(&mut answer).unwrap();
+	answer = answer.trim().to_string();
+	let answer = answer.parse::<i32>().unwrap();
+
+	match answer {
+		1 => editpw(),
+		2 => editun(),
+		3 => edittitle(),
+		_ => (),
+	}
 }

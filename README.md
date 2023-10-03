@@ -20,14 +20,8 @@ cargo build --release
 ```
 
 ## TODO list:
-- [ ] Add a way to change the master password
-- [ ] Add a way to change the password for a specific site
+- [ ] Add a way to change the master password (might just make it transfer it one by one to a new file, then delete the old one, dk yet.)
+- [x] Add a way to change the password for a specific site
 - [ ] Add a search feature
 - [ ] Add a way to change the encryption algorithm (might be a cool feature, don't know of any other password managers that do this, but it might be a bit overkill)
 
-## Closing Notes
-#### Second Rust project, so I'm sure there are a lot of things that could be done better. If you have any suggestions, feel free to open an issue or a pull request.
-## What's next?
-#### maybe some new features, mostly just bug fixes and code cleanup. This project was meant to be my dip into encryption, so I think I might've handled it well enough.
-## What about Taskly?
-#### It's sort-of dead... I'm not sure if I'll ever finish it, but I'm more likely to work on this than Taskly. Probably just switch between em and finish the TODO lists.
